@@ -1,5 +1,11 @@
 const express = require('express');
 const router = express.Router();
+// Check cache before continuing to any endpoint handlers
+router.use(cache.checkResponseCache)
+
+// Insert response into cache once handlers have finished
+router.use(cache.addResponseToCache)
+
 const db = require('./db');
 
 
