@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-// Check cache before continuing to any endpoint handlers
-router.use(cache.checkResponseCache)
 
-// Insert response into cache once handlers have finished
-router.use(cache.addResponseToCache)
+const cacheMiddleware = require('./cache');
+const Redis = require('ioredis');
 
+const redis = new Redis(process.env.REDIS_PORT, process.env.REDIS_HOST);
 const db = require('./db');
 
 
@@ -76,14 +75,13 @@ router.get('/locations/:type', typeValidator, async (req, res) => {
 });
 
 // Respond with boundary geojson for all kingdoms
-router.get('/kingdoms', async (req, res) => {
+router.get('/kingdoms', async (req, res, next) => {
     try {
         const results = await db.getKingdomBoundaries();
         if (results.length === 0) {
             res.status(404).send('No boundaries found');
             return;
         }
-
         // Add row metadata as geojson properties
         const boundaries = results.map((row) => {
             let geojson = JSON.parse(row.st_asgeojson);
@@ -92,13 +90,15 @@ router.get('/kingdoms', async (req, res) => {
         });
 
         res.json(boundaries);
+        res.locals.body = boundaries;
+      next(); // Move to next middleware (caching)
     } catch (error) {
         console.error('Error querying boundaries from database:', error);
         res.status(500).send('Internal server error');
     }
 });
 
-router.get('/kingdoms/:id/size', idValidator, async (req, res) => {
+router.get('/kingdoms/:id/size', cacheMiddleware.addResponseToCache, async (req, res) => {
     try {
         const id = req.params.id;
         const result = await db.getRegionSize(id);
@@ -116,7 +116,7 @@ router.get('/kingdoms/:id/size', idValidator, async (req, res) => {
     }
 });
 
-router.get('/kingdoms/:id/castles',idValidator, async (req, res) => {
+router.get('/kingdoms/:id/castles',cacheMiddleware.addResponseToCache, idValidator, async (req, res) => {
     try {
         const regionId = req.params.id;
         const result = await db.countCastles(regionId);
@@ -129,19 +129,26 @@ router.get('/kingdoms/:id/castles',idValidator, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' }); // Moved inside the catch block
     }
 });
-// Respond with summary of kingdom, by id
-router.get('/kingdoms/:id/summary', idValidator, async (req, res) => {
-    const id = req.params.id
-    const result = await db.getSummary('kingdoms', id)
-    res.send(result)
-  })
+
+router.get('/kingdoms/:id/summary', async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const result = await db.getSummary('kingdoms', id);
   
-  // Respond with summary of location , by id
-  router.get('/locations/:id/summary', idValidator, async (req, res) => {
-    const id = req.params.id
-    const result = await db.getSummary('locations', id)
-    res.send(result)
-  })
+      // Send the response to the client
+      res.json(result);
+  
+      // Set response data to res.locals for caching middleware
+      res.locals.body = result;
+      next(); // Move to next middleware (caching)
+    } catch (error) {
+      console.error('Error retrieving summary data:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+
+  
 
 
 module.exports = router;
