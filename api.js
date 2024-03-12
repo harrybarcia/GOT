@@ -146,6 +146,14 @@ router.get('/kingdoms/:id/summary', async (req, res, next) => {
       res.status(500).send('Internal Server Error');
     }
   });
+
+  
+// Respond with summary of location , by id
+router.get('/locations/:id/summary', idValidator, async (req, res) => {
+    const id = req.params.id
+    const result = await db.getSummary('locations', id)
+    res.json(result)
+  })
   
 
   
