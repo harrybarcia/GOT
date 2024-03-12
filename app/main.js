@@ -3,6 +3,8 @@ import template from './main.html'
 import { Map } from './components/map/map'
 import { InfoPanel } from './components/info-panel/info-panel'
 import { ApiService } from './services/api'
+import { LayerPanel } from './components/layer-panel/layer-panel'
+
 
 
 /** Main UI Controller Class */
@@ -40,6 +42,15 @@ class ViewController {
           this.infoComponent.showInfo(name, id, type)
         }}
       })
+
+      // Initialize Layer Toggle Panel
+    this.layerPanel = new LayerPanel('layer-panel-placeholder', {
+      data: { layerNames: ['kingdom', ...this.locationPointTypes] },
+      events: { layerToggle:
+        // Toggle layer in map controller on "layerToggle" event
+        event => { this.mapComponent.toggleLayer(event.detail) }
+      }
+    })
     }
 
     /** Load map data from the API */
@@ -51,7 +62,7 @@ class ViewController {
         this.mapComponent.addKingdomGeojson(kingdomsGeojson)
         
         // Show kingdom boundaries
-        this.mapComponent.toggleLayer('kingdom')
+        this.layerPanel.toggleMapLayer('kingdom')
     
         // Download location point geodata
         for (let locationType of this.locationPointTypes) {
