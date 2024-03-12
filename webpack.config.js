@@ -2,6 +2,7 @@ const path = require('path');
 const BabiliPlugin = require('babili-webpack-plugin');
 
 const webpackConfig = {
+  cache: false,
   mode: 'development', // or 'production'
   entry: './app/main.js',
   output: {

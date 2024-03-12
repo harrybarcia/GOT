@@ -6,9 +6,12 @@ const myRoutes = require('./api');
 const cache = require('./cache');
 const bodyParser=require('body-parser');
 
+// Apply CORS config
+const origin = process.env.CORS_ORIGIN || '*';
+app.use(cors({ origin }))
+
 // Set up middleware
 app.use(cache.checkResponseCache); // Check cache before handling routes
-app.use(cors()); // Enable CORS
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use('/', myRoutes); // Register your routes

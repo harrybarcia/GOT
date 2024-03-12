@@ -1,4 +1,8 @@
-import { CancelToken, get } from 'axios'
+import { CancelToken} from 'axios'
+
+import axios from 'axios';
+
+const { get } = axios; 
 
 /** API Wrapper Service Class */
 export class ApiService {

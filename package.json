@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
     "serve": "webpack --watch",
-    "startpublic":" http-server ./public",
+    "startpublic": " http-server ./public",
     "dev": "NODE_ENV=local npm start & npm run serve",
     "build": "NODE_ENV=production webpack"
   },
