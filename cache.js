@@ -10,7 +10,8 @@ module.exports = {
         console.log("cache hit");
         res.json(JSON.parse(cachedResponse)); // return the cached response
       } else {
-        next(); // only continue if result not in cache
+        console.log("no cached on " + req.path);
+        await next(); // only continue if result not in cache
       }
     } catch (error) {
       console.error('Error retrieving cached response:', error);
@@ -18,11 +19,12 @@ module.exports = {
     }
   },
 
-  async addResponseToCache(req, res, next) {
+  addResponseToCache: async function (req, res, next) {
     await next(); // Wait until other handlers have finished
-    console.log("cache miss");
+    console.log("cache miss?");
+    console.log("res.locals.body", res.locals.body);
     // Check if response data is available in res.locals.body
-    if (res.locals.body && res.statusCode === 200) {
+    if (res.locals.body) {
       try {
         // Cache the response
         await redis.set(req.path, JSON.stringify(res.locals.body));

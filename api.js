@@ -98,7 +98,7 @@ router.get('/kingdoms', async (req, res, next) => {
     }
 });
 
-router.get('/kingdoms/:id/size', cacheMiddleware.addResponseToCache, async (req, res) => {
+router.get('/kingdoms/:id/size', async (req, res, next) => {
     try {
         const id = req.params.id;
         const result = await db.getRegionSize(id);
@@ -110,13 +110,15 @@ router.get('/kingdoms/:id/size', cacheMiddleware.addResponseToCache, async (req,
         // Convert response (in square meters) to square kilometers
         const sqKm = result.size * (10 ** -6);
         res.send(sqKm.toString());
+        res.locals.body = sqKm.toString()
+        next();
     } catch (error) {
         console.error('Error getting region size:', error);
         res.status(500).send('Internal server error');
     }
 });
 
-router.get('/kingdoms/:id/castles',cacheMiddleware.addResponseToCache, idValidator, async (req, res) => {
+router.get('/kingdoms/:id/castles', cacheMiddleware.addResponseToCache, async (req, res, next) => {
     try {
         const regionId = req.params.id;
         const result = await db.countCastles(regionId);
@@ -124,6 +126,8 @@ router.get('/kingdoms/:id/castles',cacheMiddleware.addResponseToCache, idValidat
             return res.status(404).json({ error: "Record not found" });
         }
         res.send(result.count);
+        res.locals.body = result.count;
+        next();
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Internal server error' }); // Moved inside the catch block
@@ -137,10 +141,9 @@ router.get('/kingdoms/:id/summary', async (req, res, next) => {
   
       // Send the response to the client
       res.json(result);
-  
       // Set response data to res.locals for caching middleware
       res.locals.body = result;
-      next(); // Move to next middleware (caching)
+      await next(); // Move to next middleware (caching)
     } catch (error) {
       console.error('Error retrieving summary data:', error);
       res.status(500).send('Internal Server Error');
@@ -149,10 +152,12 @@ router.get('/kingdoms/:id/summary', async (req, res, next) => {
 
   
 // Respond with summary of location , by id
-router.get('/locations/:id/summary', idValidator, async (req, res) => {
+router.get('/locations/:id/summary', async (req, res, next) => {
     const id = req.params.id
     const result = await db.getSummary('locations', id)
     res.json(result)
+    res.locals.body = result;
+    next(); // Move to next middleware (caching)
   })
   
 

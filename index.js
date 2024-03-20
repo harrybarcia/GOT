@@ -17,8 +17,8 @@ app.use(express.json());
 app.use('/', myRoutes); // Register your routes
 // This middleware will add the response to the cache after the route handlers
 // have finished processing the request
-app.use(cache.addResponseToCache);
 
+app.use(cache.addResponseToCache);
 // Database connection setup
 const client = new Client({
   host: '127.0.0.1',

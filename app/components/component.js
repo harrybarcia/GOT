@@ -15,13 +15,12 @@ export class Component {
       if (template) {
         // Load template into placeholder element
         this.componentElem.innerHTML = template
-  
         // Find all refs in component
         this.refs = {}
         const refElems = this.componentElem.querySelectorAll('[ref]')
+        console.log("refElems", refElems);
         refElems.forEach((elem) => { this.refs[elem.getAttribute('ref')] = elem })
       }
-  
       if (props.events) { this.createEvents(props.events) }
     }
   
