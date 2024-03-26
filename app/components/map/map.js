@@ -66,9 +66,9 @@ export class Map extends Component {
     this.layers.kingdom = L.geoJSON(geojson, {
       // Set layer style
       style: {
-        'color': '#222',
+        'color': '#444',
         'weight': 1,
-        'opacity': 0.65
+        'opacity': 0.85
       },
       onEachFeature: this.onEachKingdom.bind(this)
     })
@@ -113,6 +113,7 @@ export class Map extends Component {
 
   /** Trigger "click" on layer with provided name */
   selectLocation (id, layerName) {
+    console.log("there");
     // Find selected layer
     const geojsonLayer = this.layers[layerName]
     const sublayers = geojsonLayer.getLayers()

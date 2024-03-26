@@ -28,15 +28,19 @@ class ViewController {
     this.infoComponent = new InfoPanel('info-panel-placeholder', {
       data: { apiService: this.api }
     })
+    console.log("this.infoComponent", this.infoComponent);
+    console.log("this", this);
 
     // Initialize Map
     this.mapComponent = new Map('map-placeholder', {
       events: { locationSelected: event => {
         // Show data in infoComponent on "locationSelected" event
         const { name, id, type } = event.detail
+        console.log("const { name, id, type }", event.detail.name, event.detail.id);
         this.infoComponent.showInfo(name, id, type)
       }}
     })
+    console.log("this", this);
 
     // Initialize Layer Toggle Panel
     this.layerPanel = new LayerPanel('layer-panel-placeholder', {
@@ -51,13 +55,15 @@ class ViewController {
     this.searchBar = new SearchBar('search-panel-placeholder', {
       data: { searchService: this.searchService },
       events: { resultSelected: event => {
+
         // Show result on map when selected from search results
         let searchResult = event.detail
-        if (!this.mapComponent.isLayerShowing(searchResult.layerName)) {
+        if (!this.mapComponent.isLayerShowing(searchResult.item.layerName)) {
+          console.log("here");
           // Show result layer if currently hidden
-          this.layerPanel.toggleMapLayer(searchResult.layerName)
+          this.layerPanel.toggleMapLayer(searchResult.item.layerName)
         }
-        this.mapComponent.selectLocation(searchResult.id, searchResult.layerName)
+        this.mapComponent.selectLocation(searchResult.item.id, searchResult.item.layerName)
       }}
     })
   }
@@ -78,8 +84,10 @@ class ViewController {
 
     // Download location point geodata
     for (let locationType of this.locationPointTypes) {
+      console.log("heremaybe");
       // Download location type GeoJSON
       const geojson = await this.api.getLocations(locationType)
+      console.log("geojson", geojson);
 
       // Add location data to search service
       this.searchService.addGeoJsonItems(geojson, locationType)

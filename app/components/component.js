@@ -32,8 +32,12 @@ export class Component {
     }
   
     /** Trigger a component event with the provided "detail" payload */
+    //triggerEvent comes form searchbar.js
     triggerEvent (eventName, detail) {
+      console.log("eventName", eventName);// outputs "resultSelected" from 
+      console.log("detail", detail);// outputs the item selected a point with a refindex
       const event = new window.CustomEvent(eventName, { detail })
+      console.log("event", event);
       this.componentElem.dispatchEvent(event)
     }
   }

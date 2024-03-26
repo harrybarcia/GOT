@@ -28,6 +28,7 @@ export class SearchService {
     this.searchbase = this.searchbase.concat(geojson.map((item) => {
       return { layerName, name: item.properties.name, id: item.properties.id }
     }))
+    console.log("this.searchbase", this.searchbase);
 
     // Re-initialize fuse search instance
     this.fuse = new Fuse(this.searchbase, this.options)

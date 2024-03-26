@@ -47,6 +47,7 @@ export class SearchBar extends Component {
     let layerItem = document.createElement('div')
     layerItem.textContent = searchResult.item.name
     layerItem.addEventListener('click', () => this.searchResultSelected(searchResult))
+    console.log("there2");
     this.refs.results.appendChild(layerItem)
   }
 
@@ -55,8 +56,9 @@ export class SearchBar extends Component {
     // Clear search input and results
     this.refs.input.value = ''
     this.refs.results.innerHTML = ''
-
+    console.log("searchResult", searchResult);// outputs the item and refId
     // Send selected result to listeners
+    // In component.js
     this.triggerEvent('resultSelected', searchResult)
   }
 }
